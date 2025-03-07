@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Daily Vibes</title>
     <style>
         body {
@@ -12,12 +14,17 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: white;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -26,23 +33,27 @@
             font-size: 2.5em;
             text-align: center;
             margin-bottom: 10px;
+            animation: fadeIn 0.5s ease-out;
         }
         .date {
             text-align: center;
             color: rgba(255, 255, 255, 0.8);
             margin-bottom: 20px;
+            animation: fadeIn 0.5s ease-out 0.2s both;
         }
         .reading {
             font-size: 1.1em;
             line-height: 1.6;
             margin-bottom: 20px;
             text-align: center;
+            animation: fadeIn 0.5s ease-out 0.4s both;
         }
         .details {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin-top: 20px;
+            animation: fadeIn 0.5s ease-out 0.6s both;
         }
         .detail-box {
             background: rgba(255, 255, 255, 0.15);
@@ -59,10 +70,45 @@
             font-size: 1.2em;
             font-weight: bold;
         }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* Loading animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            animation: fadeOut 0.5s ease-out 1s forwards;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
     </style>
 </head>
 <body>
-    <div class="container" id="content">
+    <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+    </div>
+    <div class="container" id="content" style="display: none;">
         <!-- Content will be filled by JavaScript -->
     </div>
 
@@ -149,47 +195,64 @@
 
         // Display the horoscope
         const content = document.getElementById('content');
+        const loading = document.getElementById('loading');
         
-        if (sign && horoscopes[sign.toLowerCase()]) {
-            const data = horoscopes[sign.toLowerCase()];
-            const today = new Date().toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            
-            content.innerHTML = `
-                <div class="sign">${sign.charAt(0).toUpperCase() + sign.slice(1)}</div>
-                <div class="date">${today}</div>
-                <div class="reading">${data.message}</div>
-                <div class="details">
-                    <div class="detail-box">
-                        <div class="detail-label">Lucky Number</div>
-                        <div class="detail-value">${data.number}</div>
+        // Function to show content
+        function showContent() {
+            loading.style.display = 'none';
+            content.style.display = 'block';
+        }
+
+        // Automatically load content after a brief delay
+        setTimeout(() => {
+            if (sign && horoscopes[sign.toLowerCase()]) {
+                const data = horoscopes[sign.toLowerCase()];
+                const today = new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                content.innerHTML = `
+                    <div class="sign">${sign.charAt(0).toUpperCase() + sign.slice(1)}</div>
+                    <div class="date">${today}</div>
+                    <div class="reading">${data.message}</div>
+                    <div class="details">
+                        <div class="detail-box">
+                            <div class="detail-label">Lucky Number</div>
+                            <div class="detail-value">${data.number}</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Color</div>
+                            <div class="detail-value">${data.color}</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Mood</div>
+                            <div class="detail-value">${data.mood}</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Best Time</div>
+                            <div class="detail-value">${Math.floor(Math.random() * 12) + 1}:00 ${Math.random() < 0.5 ? 'AM' : 'PM'}</div>
+                        </div>
                     </div>
-                    <div class="detail-box">
-                        <div class="detail-label">Color</div>
-                        <div class="detail-value">${data.color}</div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="reading">
+                        <div class="sign">Daily Vibes</div>
+                        <p>Welcome to your daily horoscope reading.</p>
+                        <p>Scan your zodiac sign's NFC tag to see your reading.</p>
                     </div>
-                    <div class="detail-box">
-                        <div class="detail-label">Mood</div>
-                        <div class="detail-value">${data.mood}</div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-label">Best Time</div>
-                        <div class="detail-value">${Math.floor(Math.random() * 12) + 1}:00 ${Math.random() < 0.5 ? 'AM' : 'PM'}</div>
-                    </div>
-                </div>
-            `;
-        } else {
-            content.innerHTML = `
-                <div class="reading">
-                    <div class="sign">Daily Vibes</div>
-                    <p>Welcome to your daily horoscope reading.</p>
-                    <p>Scan your zodiac sign's NFC tag to see your reading.</p>
-                </div>
-            `;
+                `;
+            }
+            showContent();
+        }, 1000);
+
+        // Handle iOS PWA display
+        if (window.navigator.standalone) {
+            document.documentElement.style.height = '100vh';
+            document.body.style.height = '100vh';
         }
     </script>
 </body>

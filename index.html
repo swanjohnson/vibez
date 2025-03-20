@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes"> <!-- Added per warning -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Daily Vibes</title>
     <style>
@@ -149,12 +149,12 @@
             content.style.display = 'block';
         }
 
-        const params = new URLSearchParams(window.location.search);
-        const sign = params.get('sign');
-        console.log("Sign from URL:", sign);
+        function loadContent() {
+            console.log("loadContent started");
+            const params = new URLSearchParams(window.location.search);
+            const sign = params.get('sign');
+            console.log("Sign from URL:", sign);
 
-        setTimeout(function() {
-            console.log("setTimeout executed");
             const today = new Date();
             const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
 
@@ -211,7 +211,10 @@
                 `;
             }
             showContent();
-        }, 1000);
+        }
+
+        console.log("Setting up setTimeout");
+        setTimeout(loadContent, 1000);
     </script>
 </body>
 </html>

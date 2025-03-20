@@ -14,17 +14,11 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: white;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -33,27 +27,23 @@
             font-size: 2.5em;
             text-align: center;
             margin-bottom: 10px;
-            animation: fadeIn 0.5s ease-out;
         }
         .date {
             text-align: center;
             color: rgba(255, 255, 255, 0.8);
             margin-bottom: 20px;
-            animation: fadeIn 0.5s ease-out 0.2s both;
         }
         .reading {
             font-size: 1.1em;
             line-height: 1.6;
             margin-bottom: 20px;
             text-align: center;
-            animation: fadeIn 0.5s ease-out 0.4s both;
         }
         .details {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin-top: 20px;
-            animation: fadeIn 0.5s ease-out 0.6s both;
         }
         .detail-box {
             background: rgba(255, 255, 255, 0.15);
@@ -70,16 +60,11 @@
             font-size: 1.2em;
             font-weight: bold;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
         .loading {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            animation: fadeOut 0.5s ease-out 1s forwards;
         }
         .loading-spinner {
             width: 50px;
@@ -92,9 +77,6 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        @keyframes fadeOut {
-            to { opacity: 0; visibility: hidden; }
-        }
     </style>
 </head>
 <body>
@@ -106,128 +88,63 @@
     </div>
 
     <script>
-        // Seeded random number generator
-        function seededRandom(seed) {
-            let x = Math.sin(seed) * 10000;
-            return x - Math.floor(x);
-        }
-
-        // Generate daily message
-        function generateDailyMessage(sign, dateSeed) {
-            const messages = {
-                aries: ["Mars fuels your ambition today. Lead with boldness.", "Energy surges through you, Aries. Seize the day.", "Your competitive edge shines. Take on new challenges."],
-                taurus: ["Venus enhances your charm. Enjoy life's pleasures.", "Stability guides you today, Taurus. Build wisely.", "Your senses are heightened. Create something beautiful."],
-                gemini: ["Mercury sharpens your wit. Communicate clearly.", "Ideas flow freely today, Gemini. Connect the dots.", "Your versatility shines. Adapt and thrive."],
-                cancer: ["The Moon boosts your intuition. Trust your gut.", "Nurture those around you, Cancer. Family first.", "Emotions guide you today. Find your balance."],
-                leo: ["The Sun ignites your charisma. Shine brightly.", "Confidence drives you, Leo. Take the stage.", "Your creativity peaks today. Inspire others."],
-                virgo: ["Mercury hones your focus. Organize efficiently.", "Details matter today, Virgo. Perfect your craft.", "Your analytical mind solves problems with ease."],
-                libra: ["Venus brings harmony. Balance is your strength.", "Diplomacy wins today, Libra. Mediate with grace.", "Beauty surrounds you. Create and connect."],
-                scorpio: ["Pluto deepens your insight. Uncover truths.", "Intensity drives you, Scorpio. Transform today.", "Your intuition is sharp. Trust the unseen."],
-                sagittarius: ["Jupiter expands your vision. Seek adventure.", "Optimism leads you, Sagittarius. Explore new paths.", "Wisdom guides your day. Share your insights."],
-                capricorn: ["Saturn steadies your resolve. Plan for success.", "Discipline pays off today, Capricorn. Stay focused.", "Your ambition rises. Build something lasting."],
-                aquarius: ["Uranus sparks innovation. Think unconventionally.", "Vision drives you, Aquarius. Shape the future.", "Connections inspire you today. Collaborate."],
-                pisces: ["Neptune fuels your dreams. Create with heart.", "Empathy guides you, Pisces. Feel deeply today.", "Imagination flows freely. Trust your intuition."]
-            };
-            const seed = dateSeed + sign.charCodeAt(0);
-            const msgIndex = Math.floor(seededRandom(seed) * messages[sign].length);
-            return messages[sign][msgIndex];
-        }
-
-        // Horoscope data
-        const horoscopes = {
-            aries: { color: "Bright Red", mood: "Energetic", sun: "Aries (Fire)", moonOptions: ["Leo (Fire)", "Sagittarius (Fire)", "Gemini (Air)"] },
-            taurus: { color: "Forest Green", mood: "Grounded", sun: "Taurus (Earth)", moonOptions: ["Virgo (Earth)", "Capricorn (Earth)", "Cancer (Water)"] },
-            gemini: { color: "Yellow", mood: "Versatile", sun: "Gemini (Air)", moonOptions: ["Libra (Air)", "Aquarius (Air)", "Aries (Fire)"] },
-            cancer: { color: "Silver", mood: "Intuitive", sun: "Cancer (Water)", moonOptions: ["Scorpio (Water)", "Pisces (Water)", "Taurus (Earth)"] },
-            leo: { color: "Royal Gold", mood: "Confident", sun: "Leo (Fire)", moonOptions: ["Aries (Fire)", "Sagittarius (Fire)", "Libra (Air)"] },
-            virgo: { color: "Navy Blue", mood: "Analytical", sun: "Virgo (Earth)", moonOptions: ["Taurus (Earth)", "Capricorn (Earth)", "Scorpio (Water)"] },
-            libra: { color: "Soft Pink", mood: "Harmonious", sun: "Libra (Air)", moonOptions: ["Gemini (Air)", "Aquarius (Air)", "Leo (Fire)"] },
-            scorpio: { color: "Deep Purple", mood: "Mysterious", sun: "Scorpio (Water)", moonOptions: ["Cancer (Water)", "Pisces (Water)", "Virgo (Earth)"] },
-            sagittarius: { color: "Electric Blue", mood: "Adventurous", sun: "Sagittarius (Fire)", moonOptions: ["Aries (Fire)", "Leo (Fire)", "Aquarius (Air)"] },
-            capricorn: { color: "Charcoal Grey", mood: "Ambitious", sun: "Capricorn (Earth)", moonOptions: ["Taurus (Earth)", "Virgo (Earth)", "Pisces (Water)"] },
-            aquarius: { color: "Electric Turquoise", mood: "Innovative", sun: "Aquarius (Air)", moonOptions: ["Gemini (Air)", "Libra (Air)", "Sagittarius (Fire)"] },
-            pisces: { color: "Sea Green", mood: "Dreamy", sun: "Pisces (Water)", moonOptions: ["Cancer (Water)", "Scorpio (Water)", "Capricorn (Earth)"] }
-        };
-
-        const zodiacSigns = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
-
-        const params = new URLSearchParams(window.location.search);
-        const sign = params.get('sign');
-        console.log("Sign from URL:", sign);
+        console.log("Script started");
 
         const content = document.getElementById('content');
         const loading = document.getElementById('loading');
         
         if (!content || !loading) {
             console.error("DOM elements not found: content or loading missing");
-            document.body.innerHTML += '<div style="text-align: center;">Error: Page elements missing. Please check the HTML structure.</div>';
+            document.body.innerHTML = '<div style="text-align: center;">Error: Page elements missing.</div>';
             return;
         }
+        console.log("DOM elements found: content and loading present");
 
         function showContent() {
-            console.log("Attempting to show content");
-            console.log("Current loading display:", loading.style.display);
-            console.log("Current content display:", content.style.display);
+            console.log("showContent called");
+            console.log("Before - loading display:", loading.style.display);
+            console.log("Before - content display:", content.style.display);
             loading.style.display = 'none';
             content.style.display = 'block';
-            console.log("After showContent - loading display:", loading.style.display);
-            console.log("After showContent - content display:", content.style.display);
+            console.log("After - loading display:", loading.style.display);
+            console.log("After - content display:", content.style.display);
         }
 
-        console.log("Script started");
+        const params = new URLSearchParams(window.location.search);
+        const sign = params.get('sign');
+        console.log("Sign from URL:", sign);
+
         setTimeout(() => {
             console.log("setTimeout executed");
             try {
-                const today = new Date();
-                const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-                console.log("Date seed:", dateSeed);
-
-                let htmlContent;
-                if (sign && horoscopes[sign.toLowerCase()]) {
-                    console.log("Sign recognized:", sign);
-                    const signLower = sign.toLowerCase();
-                    const data = horoscopes[signLower];
-                    const dailyMessage = generateDailyMessage(signLower, dateSeed);
-                    
-                    const matchIndex = Math.floor(seededRandom(dateSeed + 1) * zodiacSigns.length);
-                    const romanticMatch = zodiacSigns[matchIndex];
-
-                    const moonIndex = Math.floor(seededRandom(dateSeed + 2) * data.moonOptions.length);
-                    const moonSign = data.moonOptions[moonIndex];
-
-                    const formattedDate = today.toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: "long",
-                        day: 'numeric'
-                    });
-                    
-                    htmlContent = `
-                        <div class="sign">${sign.charAt(0).toUpperCase() + sign.slice(1)}</div>
-                        <div class="date">${formattedDate}</div>
-                        <div class="reading">${dailyMessage}</div>
+                if (sign && sign.toLowerCase() === 'virgo') { // Simplified to test Virgo
+                    console.log("Sign recognized: Virgo");
+                    content.innerHTML = `
+                        <div class="sign">Virgo</div>
+                        <div class="date">Test Date</div>
+                        <div class="reading">This is a test message for Virgo.</div>
                         <div class="details">
                             <div class="detail-box">
                                 <div class="detail-label">Best Romantic Match</div>
-                                <div class="detail-value">${romanticMatch}</div>
+                                <div class="detail-value">Taurus</div>
                             </div>
                             <div class="detail-box">
                                 <div class="detail-label">Color</div>
-                                <div class="detail-value">${data.color}</div>
+                                <div class="detail-value">Navy Blue</div>
                             </div>
                             <div class="detail-box">
                                 <div class="detail-label">Mood</div>
-                                <div class="detail-value">${data.mood}</div>
+                                <div class="detail-value">Analytical</div>
                             </div>
                             <div class="detail-box">
                                 <div class="detail-label">Sun & Moon</div>
-                                <div class="detail-value">${data.sun} / ${moonSign}</div>
+                                <div class="detail-value">Virgo (Earth) / Taurus (Earth)</div>
                             </div>
                         </div>
                     `;
                 } else {
-                    console.log("No valid sign, showing welcome message");
-                    htmlContent = `
+                    console.log("No valid sign or not Virgo, showing welcome message");
+                    content.innerHTML = `
                         <div class="reading">
                             <div class="sign">Daily Vibes</div>
                             <p>Welcome to your daily horoscope reading.</p>
@@ -235,22 +152,14 @@
                         </div>
                     `;
                 }
-
-                console.log("Setting content.innerHTML");
-                content.innerHTML = htmlContent;
                 console.log("Content set to:", content.innerHTML);
                 showContent();
             } catch (error) {
                 console.error("Error in setTimeout:", error);
-                content.innerHTML = '<div class="reading">Oops! Something went wrong: ' + error.message + '</div>';
+                content.innerHTML = '<div class="reading">Error: ' + error.message + '</div>';
                 showContent();
             }
         }, 1000);
-
-        if (window.navigator.standalone) {
-            document.documentElement.style.height = '100vh';
-            document.body.style.height = '100vh';
-        }
     </script>
 </body>
 </html>

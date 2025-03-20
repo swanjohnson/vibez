@@ -1,102 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Daily Vibes</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .sign {
-            font-size: 2.5em;
-            text-align: center;
-            margin-bottom: 10px;
-            animation: fadeIn 0.5s ease-out;
-        }
-        .date {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 20px;
-            animation: fadeIn 0.5s ease-out 0.2s both;
-        }
-        .reading {
-            font-size: 1.1em;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            text-align: center;
-            animation: fadeIn 0.5s ease-out 0.4s both;
-        }
-        .details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-            animation: fadeIn 0.5s ease-out 0.6s both;
-        }
-        .detail-box {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .detail-label {
-            font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 5px;
-        }
-        .detail-value {
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+<script>
+    // [Previous functions: seededRandom, generateDailyMessage, horoscopes, zodiacSigns unchanged]
+
+    // Get the sign from the URL
+    const params = new URLSearchParams(window.location.search);
+    const sign = params.get('sign');
+    console.log("Sign from URL:", sign);
+
+    const content = document.getElementById('content');
+    const loading = document.getElementById('loading');
+    
+    if (!content || !loading) {
+        console.error("DOM elements not found: content or loading missing");
+    }
+
+    function showContent() {
+        console.log("Showing content");
+        loading.style.display = 'none';
+        content.style.display = 'block';
+    }
+
+    setTimeout(() => {
+        try {
+            console.log("setTimeout executed");
+            const today = new Date();
+            const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+
+            if (sign && horoscopes[sign.toLowerCase()]) {
+                console.log("Sign recognized:", sign);
+                const signLower = sign.toLowerCase();
+                const data = horoscopes[signLower];
+                const dailyMessage = generateDailyMessage(signLower, dateSeed);
+                
+                const matchIndex = Math.floor(seededRandom(dateSeed + 1) * zodiacSigns.length);
+                const romanticMatch = zodiacSigns[matchIndex];
+
+                const moonIndex = Math.floor(seededRandom(dateSeed + 2) * data.moonOptions.length);
+                const moonSign = data.moonOptions[moonIndex];
+
+                const formattedDate = today.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: "long",
+                    day: 'numeric'
+                });
+                
+                content.innerHTML = `
+                    <div class="sign">${sign.charAt(0).toUpperCase() + sign.slice(1)}</div>
+                    <div class="date">${formattedDate}</div>
+                    <div class="reading">${dailyMessage}</div>
+                    <div class="details">
+                        <div class="detail-box">
+                            <div class="detail-label">Best Romantic Match</div>
+                            <div class="detail-value">${romanticMatch}</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Color</div>
+                            <div class="detail-value">${data.color}</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Mood</div>
+                            <div class="detail-value">${data.mood}</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Sun & Moon</div>
+                            <div class="detail-value">${data.sun} / ${moonSign}</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                console.log("No valid sign, showing welcome message");
+                content.innerHTML = `
+                    <div class="reading">
+                        <div class="sign">Daily Vibes</div>
+                        <p>Welcome to your daily horoscope reading.</p>
+                        <p>Scan your zodiac sign's NFC tag to see your reading.</p>
+                    </div>
+                `;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            showContent();
+        } catch (error) {
+            console.error("Error in setTimeout:", error);
+            content.innerHTML = `<div class="reading">Oops! Something went wrong. Please try again.</div>`;
+            showContent();
         }
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            animation: fadeOut 0.5s ease-out 1s forwards;
-        }
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        @keyframes fadeOut {
-            to { opacity: 0; visibility
+    }, 1000);
+
+    if (window.navigator.standalone) {
+        document.documentElement.style.height = '100vh';
+        document.body.style.height = '100vh';
+    }
+</script>

@@ -165,17 +165,24 @@
         }
 
         function showContent() {
-            console.log("Showing content");
+            console.log("Attempting to show content");
+            console.log("Current loading display:", loading.style.display);
+            console.log("Current content display:", content.style.display);
             loading.style.display = 'none';
             content.style.display = 'block';
+            console.log("After showContent - loading display:", loading.style.display);
+            console.log("After showContent - content display:", content.style.display);
         }
 
-        try {
-            setTimeout(() => {
-                console.log("setTimeout executed");
+        console.log("Script started");
+        setTimeout(() => {
+            console.log("setTimeout executed");
+            try {
                 const today = new Date();
                 const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+                console.log("Date seed:", dateSeed);
 
+                let htmlContent;
                 if (sign && horoscopes[sign.toLowerCase()]) {
                     console.log("Sign recognized:", sign);
                     const signLower = sign.toLowerCase();
@@ -195,7 +202,7 @@
                         day: 'numeric'
                     });
                     
-                    content.innerHTML = `
+                    htmlContent = `
                         <div class="sign">${sign.charAt(0).toUpperCase() + sign.slice(1)}</div>
                         <div class="date">${formattedDate}</div>
                         <div class="reading">${dailyMessage}</div>
@@ -220,7 +227,7 @@
                     `;
                 } else {
                     console.log("No valid sign, showing welcome message");
-                    content.innerHTML = `
+                    htmlContent = `
                         <div class="reading">
                             <div class="sign">Daily Vibes</div>
                             <p>Welcome to your daily horoscope reading.</p>
@@ -228,13 +235,17 @@
                         </div>
                     `;
                 }
+
+                console.log("Setting content.innerHTML");
+                content.innerHTML = htmlContent;
+                console.log("Content set to:", content.innerHTML);
                 showContent();
-            }, 1000);
-        } catch (error) {
-            console.error("Error in script execution:", error);
-            content.innerHTML = '<div class="reading">Oops! Something went wrong. Please try again.</div>';
-            showContent();
-        }
+            } catch (error) {
+                console.error("Error in setTimeout:", error);
+                content.innerHTML = '<div class="reading">Oops! Something went wrong: ' + error.message + '</div>';
+                showContent();
+            }
+        }, 1000);
 
         if (window.navigator.standalone) {
             document.documentElement.style.height = '100vh';
